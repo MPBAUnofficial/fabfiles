@@ -1,0 +1,15 @@
+#ALLDIRS = ['/www/%(site_name)s/django/.venv/lib/python2.6/site-packages/']
+
+import os
+import site
+import sys
+
+site.addsitedir('/www/%(site_name)s/django/gsgisng')
+
+activate_this = '/www/%(site_name)s/django/.venv/bin/activate_this.py'
+execfile(activate_this, dict(__file__=activate_this))
+
+os.environ["DJANGO_SETTINGS_MODULE"]="gsgisng.settings.production"
+
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()

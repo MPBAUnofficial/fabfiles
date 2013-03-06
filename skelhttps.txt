@@ -1,0 +1,66 @@
+#
+# Configuration data for virtual site %(site_name)s.fbk.eu, https based
+#
+<VirtualHost *:443>
+ServerAdmin     sysop@fbk.eu
+ServerName      %(site_name)s.fbk.eu
+
+SSLEngine on
+SSLProtocol all -SSLv2
+SSLCipherSuite ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP
+<Files ~ "\.(cgi|shtml|phtml|php3?)$">
+    SSLOptions +StdEnvVars
+</Files>
+<Directory "/var/www/cgi-bin">
+    SSLOptions +StdEnvVars
+</Directory>
+SetEnvIf User-Agent ".*MSIE.*" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+
+DocumentRoot    /www/%(site_name)s/html
+HostnameLookups off
+
+ErrorLog        /www/%(site_name)s/logs/ssl_error_log
+CustomLog       /www/%(site_name)s/logs/ssl_access_log combined
+RewriteEngine   off
+RewriteLog 	/www/%(site_name)s/logs/ssl_rewrite.log
+RewriteLogLevel 0
+
+<Directory /www/%(site_name)s/html>
+    Options None
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+</Directory>
+
+<IfModule mod_dir.c>
+    DirectoryIndex index.html index.dhtml index.php index.htm indice.html indice.htm default.htm welcome.html
+</IfModule>
+
+WSGIScriptAlias / /www/%(site_name)s/django/gsgisng/gsgisng/wsgi.py
+
+Alias /media/ /www/%(site_name)s/django/gsgisng/media/
+Alias /static/ /www/%(site_name)s/django/gsgisng/static/
+
+<Directory /www/%(site_name)s/django/gsgisng/media>
+    Order deny,allow
+    Allow from all
+</Directory>    
+
+<Directory /www/%(site_name)s/django/gsgisng/static>
+    Order deny,allow
+    Allow from all
+</Directory>
+
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerAdmin     sysop@fbk.eu
+    ServerName      %(site_name)s.fbk.eu
+    ErrorLog        /www/%(site_name)s/logs/error_log
+    CustomLog       /www/%(site_name)s/logs/access_log combined
+    TransferLog     /www/%(site_name)s/logs/access_log
+    RewriteLog      /www/%(site_name)s/logs/rewrite.log
+    RedirectPermanent / https://%(site_name)s.fbk.eu/
+</VirtualHost>
