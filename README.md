@@ -1,4 +1,8 @@
 Usage (for now):
-fab -f deploy_gsgisng.py create_site --set site_name=<name of the new site>
+================
+
+```bash
+fab create_site restart_apache --set site_name="new_site"
+```
 
 

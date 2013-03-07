@@ -3,16 +3,12 @@ from fabric.contrib.files import upload_template
 
 CLONE_URL='https://github.com/Gigaroby/gsgisng.git'
 
-env.hosts = ['geoweb']
-env.user='user'
-env.key_filename='~/.ssh/geoweb'
-
 @task
 def create_site():
     name = env.site_name
     with cd('/www'):
         run('tools/CreateSite -s \"{0}\"'.format(name))
-        with cd('{0}'.format(name)):
+        with cd(name):
             upload_template('skelhttps.txt', 'conf/{0}.conf'.format(name), {'site_name': name})
             run('mkdir django')
             with cd('django'):
@@ -35,5 +31,5 @@ def install_site():
 
 @task
 def restart_apache():
-    sudo('service httpd graceful')
-    sudo('service httpd restart')
+    run('sudo service httpd graceful')
+    run('sudo service httpd restart')
