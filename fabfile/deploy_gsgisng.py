@@ -1,23 +1,31 @@
+from os.path import join as j
 from fabric.api import *
 from fabric.contrib.files import upload_template
 
 CLONE_URL='https://github.com/Gigaroby/gsgisng.git'
 
+def template(name):
+    return j('..', 'templates', name)
+
+@roles('web')
 @task
 def create_site():
     name = env.site_name
     with cd('/www'):
         run('tools/CreateSite -s \"{0}\"'.format(name))
         with cd(name):
-            upload_template('skelhttps.txt', 'conf/{0}.conf'.format(name), {'site_name': name})
+            upload_template(template('skelhttps.txt'),
+                    'conf/{0}.conf'.format(name), {'site_name': name})
             run('mkdir django')
             with cd('django'):
                 run('git clone -q {0} gsgisng'.format(CLONE_URL))
-                upload_template('wsgi_template.txt', 'gsgisng/gsgisng/wsgi.py', {'site_name': name})
+                upload_template(template('wsgi_template.txt'),
+                        'gsgisng/gsgisng/wsgi.py', {'site_name': name})
                 run('virtualenv --system-site-packages .venv')
                 with cd('gsgisng'), prefix('source ../.venv/bin/activate'):
                     run('pip install -r requirements.txt -q --log=pip-log.txt')
 
+@roles('web')
 @task
 def install_site():
     name = env.site_name
@@ -29,6 +37,7 @@ def install_site():
         run('django-admin.py --settings=gsgisng.settings.production migrate')
 
 
+@roles('web')
 @task
 def restart_apache():
     run('sudo service httpd graceful')
