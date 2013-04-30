@@ -7,7 +7,6 @@ CLONE_URL='https://github.com/Gigaroby/gsgisng.git'
 
 def template(name):
     my_path = os.path.dirname(__file__)
-    print j(my_path, '..', 'templates', name)
     return j(my_path, '..', 'templates', name) 
 
 @roles('web')
